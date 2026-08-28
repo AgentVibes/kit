@@ -1,6 +1,6 @@
 {
   "name": "@agentvibes/kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "House runtime primitives for MobX apps: Resource, Query, usePageStore, QueryView, runtime diagnostics, cn().",
   "license": "MIT",
   "type": "module",
