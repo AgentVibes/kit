@@ -1,0 +1,102 @@
+{
+  "name": "@agentvibes/kit",
+  "version": "0.1.0",
+  "description": "House runtime primitives for MobX apps: Resource, Query, usePageStore, QueryView, runtime diagnostics, cn().",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AgentVibes/kit.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@11.24.0",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    "./resource": {
+      "types": "./dist/resource/index.d.ts",
+      "default": "./dist/resource/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "default": "./dist/react/index.js"
+    },
+    "./diagnostics": {
+      "types": "./dist/diagnostics/index.d.ts",
+      "default": "./dist/diagnostics/index.js"
+    },
+    "./cn": {
+      "types": "./dist/cn/index.d.ts",
+      "default": "./dist/cn/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome ci .",
+    "format": "biome format --write .",
+    "test": "vitest run",
+    "pack:check": "rm -rf .attw && pnpm pack --pack-destination .attw && publint --strict && attw .attw/*.tgz --profile esm-only && rm -rf .attw",
+    "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm pack:check",
+    "changeset": "changeset",
+    "release": "changeset publish"
+  },
+  "peerDependencies": {
+    "clsx": ">=2",
+    "mobx": ">=6",
+    "mobx-react-lite": ">=4",
+    "react": ">=18",
+    "tailwind-merge": ">=2",
+    "ts-pattern": ">=5"
+  },
+  "peerDependenciesMeta": {
+    "clsx": {
+      "optional": true
+    },
+    "tailwind-merge": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "mobx-react-lite": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.3",
+    "@biomejs/biome": "^2.5.0",
+    "@changesets/cli": "^2.29.7",
+    "@testing-library/react": "^16.3.0",
+    "@types/react": "^19.1.0",
+    "clsx": "^2.1.1",
+    "jsdom": "^26.1.0",
+    "mobx": "^6.13.0",
+    "mobx-react-lite": "^4.1.0",
+    "publint": "^0.3.8",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tailwind-merge": "^3.3.0",
+    "ts-pattern": "^5.7.0",
+    "tsdown": "^0.15.0",
+    "typescript": "^5.7.3",
+    "vitest": "^3.2.0"
+  },
+  "keywords": [
+    "mobx",
+    "resource",
+    "query",
+    "swr",
+    "react",
+    "ts-pattern"
+  ]
+}
