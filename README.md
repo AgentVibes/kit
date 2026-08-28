@@ -258,7 +258,13 @@ cn("p-2", isActive && "bg-blue-500", className)
 pnpm check     # typecheck + biome + vitest + build + publint + attw
 ```
 
-CI runs the same command on every push and pull request. Releases go through changesets: `pnpm changeset`, then `pnpm release`.
+CI runs the same command on every push and pull request.
+
+### Releasing
+
+Every release goes through changesets — `pnpm changeset` to describe a change, then `pnpm changeset:version` to apply the accumulated changesets to the version and changelog, then `pnpm release` to publish.
+
+The first publish goes through `changeset version` too; the version in `package.json` before that is pre-release scaffolding, not a version that was ever published. So the first published version is the one `changeset version` computes, and no version is skipped by starting above `0.0.0`.
 
 ## License
 

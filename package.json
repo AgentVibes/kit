@@ -48,6 +48,7 @@
     "pack:check": "rm -rf .attw && pnpm pack --pack-destination .attw && publint --strict && attw .attw/*.tgz --profile esm-only && rm -rf .attw",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm pack:check",
     "changeset": "changeset",
+    "changeset:version": "changeset version",
     "release": "changeset publish"
   },
   "peerDependencies": {
