@@ -8,7 +8,7 @@ pnpm add @agentvibes/kit
 
 | Entry point | What it gives you | Peers it needs |
 | --- | --- | --- |
-| `@agentvibes/kit/resource` | `Resource<T, E>`, `Query<T, E>`, `QueryFamily<K, T>` | `mobx`, `ts-pattern` |
+| `@agentvibes/kit/resource` | `Resource<T, E>`, `Query<T, E>`, `QueryFamily<K, T>`, `Mutation<E>`, `PagedQuery<T, C, E>` | `mobx`, `ts-pattern` |
 | `@agentvibes/kit/react` | `usePageStore`, `QueryView`, `ShowWhen` | `react`, `mobx-react-lite`, `ts-pattern` |
 | `@agentvibes/kit/diagnostics` | `warnDegraded`, `warnNotImplemented`, `warnUnexpected` | none |
 | `@agentvibes/kit/cn` | `cn()` | `clsx`, `tailwind-merge` |
@@ -100,6 +100,86 @@ months.dispose()   // disposes every entry
 ```
 
 The cache is deliberately not observable — it is memoization, not state — so `family.get(key)` is safe to call during render. Also: `peek`, `has`, `keys`, `size`, `remove`, `invalidateAll`.
+
+### `Mutation<E>`
+
+The write half of the four-state rule: one instance per store, one observable state per key, so two controls never share a spinner.
+
+```ts
+import { createMutation, takeOut, putBack } from "@agentvibes/kit/resource"
+
+class GalleryStore {
+  mutations = createMutation()
+
+  deleteMedia(id: string) {
+    return this.mutations.run(
+      `deleteMedia:${id}`,
+      () => api.deleteMedia(id),
+      {
+        optimistic: () => {
+          const taken = takeOut(this.media, (m) => m.id, id)
+          this.media = taken.list
+          return () => {
+            this.media = putBack(this.media, taken.removal, (m) => m.id).list
+          }
+        },
+      },
+    )
+  }
+}
+```
+
+Keys are the caller's and should be stable: `"createGallery"`, `` `deleteMedia:${id}` ``. Read one with `mutations.get(key)`, which returns `{status:"idle"|"saving"|"ok"|"error"}` — keys never run read as idle.
+
+`run()` returns a three-armed result:
+
+```ts
+type MutationResult<T, E = Error> =
+  | { status: "ok"; data: T }
+  | { status: "error"; error: E }
+  | { status: "busy" }     // already in flight for this key; nothing was sent
+```
+
+**Concurrency:** a second `run()` on a key already in flight sends nothing and returns `busy`. That is the conservative default — a double-submitted write is usually a bug, not a queue. Queueing was the alternative; it belongs in the caller, where the ordering rules are actually known.
+
+`optimistic` applies an edit immediately and returns its undo. The rollback runs if and only if the request fails — never on success, and never on `busy`, where nothing was applied.
+
+`reset(key)` returns a key to idle, backing the "clear" affordance (dismiss an error, drop a lingering checkmark) and freeing accumulated per-item keys. It clears the badge only: it does not cancel a request, and the key stays guarded until that request lands, so a reset cannot open a double-submit hole. `isInFlight(key)` reads the real thing.
+
+#### `takeOut` / `putBack`
+
+Optimistic list edits, with the two guards that were bugs before they were guards. `takeOut` returns a `Removal<T>` — a closed union, because "the item was not in the list" is a state, not a missing value. `putBack` clamps the remembered index (the list can have shrunk while the request was in flight) and refuses to insert a key the list already contains (a route transition can *replace* the list with one the server still reports the item in; splicing on top mounted the same id twice). Callers that track a count read the returned `inserted` rather than assuming the restore happened.
+
+### `PagedQuery<T, C, E>`
+
+A cursor-paged list that accumulates.
+
+```ts
+import { createPagedQuery } from "@agentvibes/kit/resource"
+
+const activity = createPagedQuery<ActivityEvent, string>({
+  fetchPage: (cursor) => api.fetchActivity({ afterCursor: cursor }),
+  keyOf: (event) => event.id,
+})
+
+await activity.load()       // first page
+await activity.loadMore()   // append the next one
+await activity.revalidate() // refresh the pages already loaded
+```
+
+A page is reported as `{ items, nextCursor: C | null, total?: number }`. `nextCursor: null` is the single termination signal, and synthesising it is the adapter's job — the three real shapes in the park each report the end differently:
+
+| Server shape | Adapter writes |
+| --- | --- |
+| opaque keyset cursor | `nextCursor` already arrives as `string \| null` |
+| page number plus `total` | `page * limit >= total ? null : page + 1` |
+| offset plus `hasMore` | `hasMore ? nextOffset : null` |
+
+Three independent axes, because a UI renders them in different places: `state` (`idle`/`loading`/`ready`/`error` — does the list paint at all), `pageLoad` (`idle`/`loading`/`error` — is the scroll sentinel working), `refresh` (same three — is the pull-to-refresh spinner turning). Plus `items`, `hasMore`, `isEmpty`, `total`, `pageCount`.
+
+`loadMore()` no-ops unless the list is ready, no page is in flight, and a next cursor exists, so a scroll sentinel can call it on every intersection. A failed page leaves the cursor untouched, so a retry re-requests the page that failed rather than skipping it. Appends drop keys already loaded — an overlapping page must never reach React as two children with the same key.
+
+`revalidate()` re-walks the pages already loaded, following the cursors the server hands back, and swaps the whole list in at the end. The walk builds into a scratch list and commits only if every page lands: a failure part-way leaves the current items exactly as they were and reports the error on `refresh`, the same choice `Query` makes with `stale-error`. Note that with a keyset cursor, rows inserted since the first walk shift page boundaries, so a re-walk can return slightly different membership — inherent to keyset pagination, not a defect.
 
 ## `/react`
 
