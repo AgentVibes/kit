@@ -1,0 +1,24 @@
+[stack]
+# detected from: (root)
+platform = "unknown"                # vite-spa | expo | next-client | next-ssr
+state = "mobx"                      # mobx | none
+storeRuntime = "client-singleton"        # client-singleton | request-scoped | none
+styling = "theme-inline"                  # theme-inline | tailwind | nativewind
+componentModel = "conventional"    # two-tier | conventional
+
+# This repo IS @agentvibes/kit. `no-local-kit-clone` is error-tier and fires on
+# the six canonical declarations here — Resource<T>, QueryState, the diagnostics
+# pair, usePageStore — which are the definitions the rule tells every other repo
+# to import instead of redeclaring. The rule's carve-out globs
+# (**/packages/kit/**, **/agentvibes-kit/**) were written before this package
+# existed and do not match a standalone repo whose files verify sees as
+# src/resource/resource.ts. Guardrails 0.2.0 added the scope so the repo can say
+# so itself; the rules carry `appliesTo: not-kit-source` (is-086a90ac).
+[verify]
+kit_source = "^src/"
+
+# One preset everywhere (epic is-a70a5963). With this line `guardrails verify`
+# exits 2 and `doctor` exits 1 if biome.json stops extending the preset or
+# starts restating its decisions.
+[biome]
+preset = "enforced"

@@ -15,7 +15,9 @@ describe("runtime diagnostics", () => {
     events = []
     resetDiagnostics()
     setDiagnosticHook((event) => events.push(event))
+    // biome-ignore lint/suspicious/noEmptyBlockStatements: a deliberate no-op, not an unfinished block
     vi.spyOn(console, "warn").mockImplementation(() => {})
+    // biome-ignore lint/suspicious/noEmptyBlockStatements: a deliberate no-op, not an unfinished block
     vi.spyOn(console, "error").mockImplementation(() => {})
   })
 

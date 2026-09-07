@@ -12,6 +12,7 @@ class CountingStore {
 }
 
 /** Flush the microtask the deferred disposal is scheduled on. */
+// biome-ignore lint/suspicious/noEmptyBlockStatements: a deliberate no-op, not an unfinished block
 const flush = () => act(async () => {})
 
 describe("usePageStore under StrictMode", () => {

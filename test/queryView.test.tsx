@@ -47,6 +47,7 @@ describe("QueryView", () => {
   })
 
   it("renders the loading slot during the first fetch", () => {
+    // biome-ignore lint/suspicious/noEmptyBlockStatements: a deliberate no-op, not an unfinished block
     const query = createQuery(() => new Promise<string>(() => {}))
     const view = renderView(query)
 
@@ -69,6 +70,7 @@ describe("QueryView", () => {
   })
 
   it("keeps the ready slot and flags revalidating while a refetch is in flight", async () => {
+    // biome-ignore lint/suspicious/noEmptyBlockStatements: a deliberate no-op, not an unfinished block
     let resolveSecond: (value: string) => void = () => {}
     let call = 0
     const query = createQuery(() => {

@@ -180,6 +180,7 @@ describe("PagedQuery first load", () => {
   })
 
   it("ignores a second load while the first is in flight", async () => {
+    // biome-ignore lint/suspicious/noEmptyBlockStatements: a deliberate no-op, not an unfinished block
     const fetchPage = vi.fn(() => new Promise<PageResult<Row, string>>(() => {}))
     const paged = createPagedQuery<Row, string>({ fetchPage, keyOf: (row) => row.id })
 
@@ -207,6 +208,7 @@ describe("PagedQuery loadMore", () => {
       fetchPage: (cursor) => {
         calls += 1
         if (cursor === undefined) return Promise.resolve({ items: rows("a"), nextCursor: "1" })
+        // biome-ignore lint/suspicious/noEmptyBlockStatements: a deliberate no-op, not an unfinished block
         return new Promise<PageResult<Row, string>>(() => {})
       },
       keyOf: (row) => row.id,
@@ -379,6 +381,7 @@ describe("PagedQuery revalidate", () => {
         if (cursor === undefined && calls === 1) {
           return Promise.resolve({ items: rows("a"), nextCursor: null })
         }
+        // biome-ignore lint/suspicious/noEmptyBlockStatements: a deliberate no-op, not an unfinished block
         return new Promise<PageResult<Row, string>>(() => {})
       },
       keyOf: (row) => row.id,

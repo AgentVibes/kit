@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@agentvibes/guardrails':
+        specifier: ^0.2.0
+        version: 0.2.0
       '@arethetypeswrong/cli':
         specifier: ^0.18.3
         version: 0.18.5
@@ -61,6 +64,11 @@ importers:
         version: 3.2.7(jiti@2.7.0)(jsdom@26.1.0(supports-color@7.2.0))(supports-color@7.2.0)
 
 packages:
+
+  '@agentvibes/guardrails@0.2.0':
+    resolution: {integrity: sha512-eKouBSX0p1WvPyCKONQWxKNC27kUBJ82mKg+1bRTcyzzRb06oiyLtpFXodiqCbT1z9S5Vj9A80GwGwxC4pP4iw==}
+    engines: {node: '>=22'}
+    hasBin: true
 
   '@andrewbranch/untar.js@1.0.4':
     resolution: {integrity: sha512-pVXSwPsLuw8IGLo2Di0EaOfsk+ntVvpkk942J/sHYIkwvtKUakEcPh7HBgZ6tuimgzKSEHgCvO4XgQ05DEbwDw==}
@@ -1802,6 +1810,11 @@ packages:
     engines: {node: '>=10'}
 
 snapshots:
+
+  '@agentvibes/guardrails@0.2.0':
+    dependencies:
+      ts-pattern: 5.9.0
+      typescript: 5.9.3
 
   '@andrewbranch/untar.js@1.0.4': {}
 

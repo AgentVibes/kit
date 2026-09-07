@@ -70,6 +70,7 @@ describe("Query.resource", () => {
   })
 
   it("reads loading during the first fetch", () => {
+    // biome-ignore lint/suspicious/noEmptyBlockStatements: a deliberate no-op, not an unfinished block
     const query = createQuery(() => new Promise<string>(() => {}))
     void query.fetch()
     expect(query.resource).toEqual({ status: "loading" })

@@ -199,6 +199,7 @@ export class Query<T, E = Error> {
         "Query.enableWindowFocusRefetch",
         `no document in this environment; focus refetch is a no-op (${this.options.debugLabel ?? "query"})`,
       )
+      // biome-ignore lint/suspicious/noEmptyBlockStatements: a deliberate no-op, not an unfinished block
       return () => {}
     }
 
@@ -230,6 +231,7 @@ export class Query<T, E = Error> {
         "Query.enableRefetchInterval",
         `no positive refetchIntervalMs; polling is a no-op (${this.options.debugLabel ?? "query"})`,
       )
+      // biome-ignore lint/suspicious/noEmptyBlockStatements: a deliberate no-op, not an unfinished block
       return () => {}
     }
 

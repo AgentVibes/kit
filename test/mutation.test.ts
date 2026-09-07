@@ -9,7 +9,9 @@ import {
 type Deferred<T> = { promise: Promise<T>; resolve: (v: T) => void; reject: (e: unknown) => void }
 
 function deferred<T>(): Deferred<T> {
+  // biome-ignore lint/suspicious/noEmptyBlockStatements: a deliberate no-op, not an unfinished block
   let resolve: (v: T) => void = () => {}
+  // biome-ignore lint/suspicious/noEmptyBlockStatements: a deliberate no-op, not an unfinished block
   let reject: (e: unknown) => void = () => {}
   const promise = new Promise<T>((res, rej) => {
     resolve = res
