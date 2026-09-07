@@ -1,12 +1,12 @@
-import type { ReactElement, ReactNode } from "react"
-import { match } from "ts-pattern"
+import type { ReactElement, ReactNode } from "react";
+import { match } from "ts-pattern";
 
 export type ShowWhenProps = {
-  when: boolean
-  children: ReactNode
+  when: boolean;
+  children: ReactNode;
   /** Rendered instead of `children` when `when` is false. Defaults to nothing. */
-  fallback?: ReactNode
-}
+  fallback?: ReactNode;
+};
 
 /**
  * `{cond && <X/>}` renders the string "0" when `cond` is the number zero, and
@@ -24,5 +24,5 @@ export function ShowWhen({ when, children, fallback = null }: ShowWhenProps): Re
         .with(false, () => fallback)
         .exhaustive()}
     </>
-  )
+  );
 }

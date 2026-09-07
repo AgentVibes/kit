@@ -1,11 +1,11 @@
-import { match } from "ts-pattern"
+import { match } from "ts-pattern";
 
 /**
  * Is a request in flight right now? Orthogonal to `status` on purpose: "we
  * have data" and "we are fetching" are independent axes, and only two axes can
  * express stale-while-revalidate (`success` + `fetching`). A flat union cannot.
  */
-export type FetchActivity = "idle" | "fetching"
+export type FetchActivity = "idle" | "fetching";
 
 /**
  * The full state of a Query.
@@ -23,12 +23,12 @@ export type QueryState<T, E = Error> =
   | { status: "success"; data: T; dataUpdatedAt: number; fetchActivity: FetchActivity }
   | { status: "error"; error: E; fetchActivity: FetchActivity }
   | {
-      status: "stale-error"
-      data: T
-      dataUpdatedAt: number
-      error: E
-      fetchActivity: FetchActivity
-    }
+      status: "stale-error";
+      data: T;
+      dataUpdatedAt: number;
+      error: E;
+      fetchActivity: FetchActivity;
+    };
 
 /**
  * The four arms a UI actually renders, derived from the five-arm QueryState.
@@ -43,7 +43,7 @@ export type QueryViewState<T, E = Error> =
   | { status: "idle" }
   | { status: "loading" }
   | { status: "error"; error: E; revalidating: boolean }
-  | { status: "ready"; value: T; revalidating: boolean; stale: boolean; error?: E }
+  | { status: "ready"; value: T; revalidating: boolean; stale: boolean; error?: E };
 
 export function toQueryViewState<T, E>(
   state: QueryState<T, E>,
@@ -79,5 +79,5 @@ export function toQueryViewState<T, E>(
         revalidating: s.fetchActivity === "fetching",
       }),
     )
-    .exhaustive()
+    .exhaustive();
 }

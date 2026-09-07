@@ -74,6 +74,7 @@
     }
   },
   "devDependencies": {
+    "@agentvibes/guardrails": "^0.2.0",
     "@arethetypeswrong/cli": "^0.18.3",
     "@biomejs/biome": "^2.5.0",
     "@changesets/cli": "^2.29.7",

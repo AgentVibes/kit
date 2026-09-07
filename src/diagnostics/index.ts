@@ -1,4 +1,4 @@
-export type { DiagnosticEvent, DiagnosticHook, DiagnosticKind } from "./diagnostics.js"
+export type { DiagnosticEvent, DiagnosticHook, DiagnosticKind } from "./diagnostics.js";
 export {
   getDiagnosticHook,
   resetDiagnostics,
@@ -6,4 +6,4 @@ export {
   warnDegraded,
   warnNotImplemented,
   warnUnexpected,
-} from "./diagnostics.js"
+} from "./diagnostics.js";

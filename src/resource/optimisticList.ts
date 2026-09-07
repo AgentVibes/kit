@@ -1,11 +1,11 @@
-import { match } from "ts-pattern"
+import { match } from "ts-pattern";
 
 /**
  * Where an optimistically removed item was, so a failed request can put it
  * back. A closed union rather than `T | undefined` plus a sentinel index:
  * "the item was not in the list" is a state, not a missing value.
  */
-export type Removal<T> = { kind: "removed"; at: number; item: T } | { kind: "absent" }
+export type Removal<T> = { kind: "removed"; at: number; item: T } | { kind: "absent" };
 
 /** Take the item with `key` out of `list`, remembering where it was. */
 export function takeOut<T>(
@@ -13,12 +13,12 @@ export function takeOut<T>(
   keyOf: (item: T) => string,
   key: string,
 ): { list: T[]; removal: Removal<T> } {
-  const at = list.findIndex((item) => keyOf(item) === key)
-  const item = list[at]
+  const at = list.findIndex((item) => keyOf(item) === key);
+  const item = list[at];
   return {
     list: list.filter((candidate) => keyOf(candidate) !== key),
     removal: item === undefined ? { kind: "absent" } : { kind: "removed", at, item },
-  }
+  };
 }
 
 /**
@@ -44,13 +44,13 @@ export function putBack<T>(
   return match(removal)
     .with({ kind: "absent" }, () => ({ list: [...list], inserted: false }))
     .with({ kind: "removed" }, ({ at, item }) => {
-      const key = keyOf(item)
+      const key = keyOf(item);
       if (list.some((candidate) => keyOf(candidate) === key)) {
-        return { list: [...list], inserted: false }
+        return { list: [...list], inserted: false };
       }
-      const next = [...list]
-      next.splice(Math.min(at, next.length), 0, item)
-      return { list: next, inserted: true }
+      const next = [...list];
+      next.splice(Math.min(at, next.length), 0, item);
+      return { list: next, inserted: true };
     })
-    .exhaustive()
+    .exhaustive();
 }

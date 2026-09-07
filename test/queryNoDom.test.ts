@@ -1,35 +1,36 @@
 // @vitest-environment node
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   type DiagnosticEvent,
   resetDiagnostics,
   setDiagnosticHook,
-} from "../src/diagnostics/index.js"
-import { createQuery } from "../src/resource/index.js"
+} from "../src/diagnostics/index.js";
+import { createQuery } from "../src/resource/index.js";
 
 describe("Query.enableWindowFocusRefetch without a DOM", () => {
   beforeEach(() => {
-    resetDiagnostics()
-    setDiagnosticHook(null)
-  })
+    resetDiagnostics();
+    setDiagnosticHook(null);
+  });
 
   it("degrades to a no-op and reports it instead of throwing", () => {
-    const events: DiagnosticEvent[] = []
-    setDiagnosticHook((event) => events.push(event))
-    vi.spyOn(console, "warn").mockImplementation(() => {})
+    const events: DiagnosticEvent[] = [];
+    setDiagnosticHook((event) => events.push(event));
+    // biome-ignore lint/suspicious/noEmptyBlockStatements: a deliberate no-op, not an unfinished block
+    vi.spyOn(console, "warn").mockImplementation(() => {});
 
-    const query = createQuery(async () => "data")
-    const stop = query.enableWindowFocusRefetch()
+    const query = createQuery(async () => "data");
+    const stop = query.enableWindowFocusRefetch();
 
-    expect(() => stop()).not.toThrow()
-    expect(() => query.dispose()).not.toThrow()
-    expect(events).toHaveLength(1)
+    expect(() => stop()).not.toThrow();
+    expect(() => query.dispose()).not.toThrow();
+    expect(events).toHaveLength(1);
     expect(events[0]).toMatchObject({
       kind: "degraded",
       category: "Query.enableWindowFocusRefetch",
-    })
+    });
 
-    setDiagnosticHook(null)
-    vi.restoreAllMocks()
-  })
-})
+    setDiagnosticHook(null);
+    vi.restoreAllMocks();
+  });
+});

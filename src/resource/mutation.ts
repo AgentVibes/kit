@@ -1,4 +1,4 @@
-import { flow, makeAutoObservable, observable } from "mobx"
+import { flow, makeAutoObservable, observable } from "mobx";
 
 /**
  * Per-control mutation state, observed by the UI so every async control can
@@ -9,7 +9,7 @@ export type MutationState<E = Error> =
   | { status: "idle" }
   | { status: "saving" }
   | { status: "ok" }
-  | { status: "error"; error: E }
+  | { status: "error"; error: E };
 
 /**
  * What `run()` gives the caller back.
@@ -22,30 +22,30 @@ export type MutationState<E = Error> =
 export type MutationResult<T, E = Error> =
   | { status: "ok"; data: T }
   | { status: "error"; error: E }
-  | { status: "busy" }
+  | { status: "busy" };
 
 type BaseMutationOptions = {
-  debugLabel?: string
-}
+  debugLabel?: string;
+};
 
 /** Same rule as `QueryOptions`: only `E = Error` may omit the normalizer. */
 export type MutationOptions<E = Error> = BaseMutationOptions &
   (E extends Error
     ? { normalizeError?: (err: unknown) => E }
-    : { normalizeError: (err: unknown) => E })
+    : { normalizeError: (err: unknown) => E });
 
 export type RunOptions<T> = {
   /** Called with the parsed result before `run()` resolves, on success only. */
-  onOk?: (data: T) => void
+  onOk?: (data: T) => void;
   /**
    * Apply an optimistic edit now and return the function that undoes it.
    * The rollback runs if — and only if — the request fails. It never runs on
    * success, and never on `busy`, where nothing was applied.
    */
-  optimistic?: () => () => void
-}
+  optimistic?: () => () => void;
+};
 
-type PrivateKeys = "options" | "inflight" | "normalize"
+type PrivateKeys = "options" | "inflight" | "normalize";
 
 /**
  * A keyed set of write operations, each with its own observable state.
@@ -66,44 +66,44 @@ type PrivateKeys = "options" | "inflight" | "normalize"
  * needs it, it belongs in that caller where the ordering rules are known.
  */
 export class Mutation<E = Error> {
-  private readonly states = observable.map<string, MutationState<E>>()
+  private readonly states = observable.map<string, MutationState<E>>();
   /**
    * In-flight keys, tracked separately from `states` and deliberately not
    * observable. `reset(key)` clears the rendered badge — that is its whole
    * job — but it must not open a double-submit hole, so the guard reads this
    * instead of looking for a `saving` state.
    */
-  private readonly inflight = new Set<string>()
-  private options: MutationOptions<E>
+  private readonly inflight = new Set<string>();
+  private options: MutationOptions<E>;
 
   constructor(options: MutationOptions<E>) {
-    this.options = options
+    this.options = options;
     makeAutoObservable<Mutation<E>, PrivateKeys>(this, {
       options: false,
       inflight: false,
       normalize: false,
-    })
+    });
   }
 
   /** State of one key. Keys never run read as idle. */
   get(key: string): MutationState<E> {
-    return this.states.get(key) ?? { status: "idle" }
+    return this.states.get(key) ?? { status: "idle" };
   }
 
   /** Whether a request for `key` is in flight, regardless of the rendered state. */
   isInFlight(key: string): boolean {
-    return this.inflight.has(key)
+    return this.inflight.has(key);
   }
 
   /** Keys currently rendering as `saving`. */
   get savingKeys(): string[] {
     return [...this.states.entries()]
       .filter(([, state]) => state.status === "saving")
-      .map(([key]) => key)
+      .map(([key]) => key);
   }
 
   get size(): number {
-    return this.states.size
+    return this.states.size;
   }
 
   /**
@@ -115,11 +115,11 @@ export class Mutation<E = Error> {
    * the key stays guarded until that request lands.
    */
   reset(key: string): void {
-    this.states.delete(key)
+    this.states.delete(key);
   }
 
   resetAll(): void {
-    this.states.clear()
+    this.states.clear();
   }
 
   /**
@@ -134,43 +134,43 @@ export class Mutation<E = Error> {
     if (this.inflight.has(key)) {
       // A request for this key really is in flight, so `saving` is the honest
       // badge even if the caller had cleared it.
-      this.states.set(key, { status: "saving" })
-      return Promise.resolve({ status: "busy" })
+      this.states.set(key, { status: "saving" });
+      return Promise.resolve({ status: "busy" });
     }
 
-    this.inflight.add(key)
-    this.states.set(key, { status: "saving" })
-    const rollback = runOptions.optimistic?.()
+    this.inflight.add(key);
+    this.states.set(key, { status: "saving" });
+    const rollback = runOptions.optimistic?.();
 
-    const mutation = this
+    const mutation = this;
     const promise: Promise<MutationResult<T, E>> = flow(function* () {
       try {
-        const data: T = yield request()
-        mutation.states.set(key, { status: "ok" })
-        runOptions.onOk?.(data)
-        return { status: "ok" as const, data }
+        const data: T = yield request();
+        mutation.states.set(key, { status: "ok" });
+        runOptions.onOk?.(data);
+        return { status: "ok" as const, data };
       } catch (err: unknown) {
-        const error = mutation.normalize(err)
-        rollback?.()
-        mutation.states.set(key, { status: "error", error })
-        return { status: "error" as const, error }
+        const error = mutation.normalize(err);
+        rollback?.();
+        mutation.states.set(key, { status: "error", error });
+        return { status: "error" as const, error };
       } finally {
-        mutation.inflight.delete(key)
+        mutation.inflight.delete(key);
       }
-    })()
+    })();
 
-    return promise
+    return promise;
   }
 
   private normalize(err: unknown): E {
-    if (this.options.normalizeError) return this.options.normalizeError(err)
+    if (this.options.normalizeError) return this.options.normalizeError(err);
     // Sound because the options type only makes normalizeError optional when
     // E is assignable from Error.
-    return (err instanceof Error ? err : new Error(String(err))) as E
+    return (err instanceof Error ? err : new Error(String(err))) as E;
   }
 }
 
 /** Convenience constructor for the common `E = Error` case. */
 export function createMutation(options: BaseMutationOptions = {}): Mutation<Error> {
-  return new Mutation<Error>(options)
+  return new Mutation<Error>(options);
 }
