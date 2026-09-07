@@ -1,23 +1,23 @@
-import { Observer } from "mobx-react-lite"
-import type { ReactElement, ReactNode } from "react"
-import { match } from "ts-pattern"
-import type { Query } from "../../resource/query.js"
+import { Observer } from "mobx-react-lite";
+import type { ReactElement, ReactNode } from "react";
+import { match } from "ts-pattern";
+import type { Query } from "../../resource/query.js";
 
 export type QueryViewProps<T, E = Error> = {
-  query: Query<T, E>
+  query: Query<T, E>;
   /** Nothing requested yet (or gated off by `enabled`). Falls back to `loading`. */
-  idle?: () => ReactNode
+  idle?: () => ReactNode;
   /** First load, nothing to show yet. */
-  loading: () => ReactNode
+  loading: () => ReactNode;
   /** Failed with nothing to fall back on. `retry` forces a refetch. */
-  error: (args: { error: E; revalidating: boolean; retry: () => void }) => ReactNode
+  error: (args: { error: E; revalidating: boolean; retry: () => void }) => ReactNode;
   /**
    * Data present. `revalidating` is true while a refetch is in flight (shimmer
    * or refresh dot), `stale` once the data is past `staleTimeMs`, and `error`
    * is set when the last refetch failed but the old data is still shown.
    */
-  ready: (args: { value: T; revalidating: boolean; stale: boolean; error?: E }) => ReactNode
-}
+  ready: (args: { value: T; revalidating: boolean; stale: boolean; error?: E }) => ReactNode;
+};
 
 /**
  * Renders the four async states of a Query distinctly — the canonical
@@ -27,7 +27,7 @@ export type QueryViewProps<T, E = Error> = {
  * alone and never the parent.
  */
 export function QueryView<T, E = Error>(props: QueryViewProps<T, E>): ReactElement {
-  const { query, idle, loading, error, ready } = props
+  const { query, idle, loading, error, ready } = props;
 
   return (
     <Observer>
@@ -48,5 +48,5 @@ export function QueryView<T, E = Error>(props: QueryViewProps<T, E>): ReactEleme
         </>
       )}
     </Observer>
-  )
+  );
 }

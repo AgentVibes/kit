@@ -1,4 +1,4 @@
-import { defineConfig } from "tsdown"
+import { defineConfig } from "tsdown";
 
 export default defineConfig({
   entry: [
@@ -17,4 +17,4 @@ export default defineConfig({
   // inlining a copy into every entry — two copies of the diagnostics dedup set
   // would make resetDiagnostics() only clear one of them.
   unbundle: true,
-})
+});
