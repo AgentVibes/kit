@@ -39,12 +39,28 @@ describe("runtime diagnostics", () => {
     expect(console.warn).toHaveBeenCalledTimes(1);
   });
 
-  it("fires a degraded warning only once per category", () => {
+  it("fires a degraded warning only once per category and detail", () => {
     warnDegraded("Chart.scale", "first");
-    warnDegraded("Chart.scale", "second");
+    warnDegraded("Chart.scale", "first");
 
     expect(events).toHaveLength(1);
     expect(events[0]?.detail).toBe("first");
+  });
+
+  it("fires again when the same category comes with a different detail", () => {
+    warnDegraded("Chart.scale", "first");
+    warnDegraded("Chart.scale", "second");
+    warnNotImplemented("Export.pdf", "A");
+    warnNotImplemented("Export.pdf", "B");
+
+    expect(events.map((e) => e.detail)).toEqual(["first", "second", "A", "B"]);
+  });
+
+  it("keeps category and detail apart in the dedup key", () => {
+    warnDegraded("a:b", "c");
+    warnDegraded("a", "b:c");
+
+    expect(events).toHaveLength(2);
   });
 
   it("dedups not-implemented separately from degraded on the same category", () => {

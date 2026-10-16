@@ -229,7 +229,7 @@ Both branches are named, and a numeric zero cannot leak into the output the way 
 
 ## `/diagnostics`
 
-The replacement for `// TODO`. A TODO never runs; these fire the first time the path is actually hit, dedup'd per category, greppable, and routable to a debug panel.
+The replacement for `// TODO`. A TODO never runs; these fire the first time the path is actually hit, dedup'd per category and detail, greppable, and routable to a debug panel.
 
 ```ts
 import { warnDegraded, warnNotImplemented, setDiagnosticHook } from "@agentvibes/kit/diagnostics"
@@ -240,7 +240,7 @@ warnNotImplemented("Export.pdf", "exists upstream, not ported yet")
 setDiagnosticHook((event) => debugPanel.push(event))
 ```
 
-`warnDegraded` and `warnNotImplemented` fire once per category; `warnUnexpected(category, detail, data?)` always fires, because a contradicted assumption matters every time. `resetDiagnostics()` clears the dedup set for tests.
+`warnDegraded` and `warnNotImplemented` fire once per category and detail (the same category with a different detail reports again); `warnUnexpected(category, detail, data?)` always fires, because a contradicted assumption matters every time. `resetDiagnostics()` clears the dedup set for tests.
 
 ## `/cn`
 
