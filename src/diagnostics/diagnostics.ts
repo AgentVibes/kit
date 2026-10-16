@@ -2,7 +2,7 @@
  * Runtime diagnostics — the house replacement for `// TODO` / `// FIXME`.
  *
  * A TODO never runs. These fire the first time the code path is actually hit,
- * dedup'd per key, greppable, and routable to a debug panel via the hook.
+ * dedup'd per category and detail, greppable, and routable to a debug panel via the hook.
  *
  *   warnDegraded("Chart.scale", "linear interp; cubic deferred, upstream:120-140")
  *   warnNotImplemented("Export.pdf", "exists upstream, not ported yet")
@@ -36,6 +36,11 @@ export function getDiagnosticHook(): DiagnosticHook | null {
 
 const seen = new Set<string>();
 
+// A different detail on the same category is a different degraded path, so it reports too.
+function dedupKey(kind: DiagnosticKind, category: string, detail: string): string {
+  return JSON.stringify([kind, category, detail]);
+}
+
 /** Clear the dedup set (and, optionally in tests, start from a clean slate). */
 export function resetDiagnostics(): void {
   seen.clear();
@@ -62,18 +67,18 @@ function emit(
   hook?.(event);
 }
 
-/** This path works, but not the way it should. Fires once per category. */
+/** This path works, but not the way it should. Fires once per category and detail. */
 export function warnDegraded(category: string, detail: string): void {
-  const key = `degraded:${category}`;
+  const key = dedupKey("degraded", category, detail);
   if (seen.has(key)) return;
   seen.add(key);
   emit("degraded", category, detail);
   console.warn(`⚡ DEGRADED ${category}: ${detail}`);
 }
 
-/** This path does nothing yet. Fires once per category. */
+/** This path does nothing yet. Fires once per category and detail. */
 export function warnNotImplemented(category: string, detail: string): void {
-  const key = `not-impl:${category}`;
+  const key = dedupKey("not-implemented", category, detail);
   if (seen.has(key)) return;
   seen.add(key);
   emit("not-implemented", category, detail);
