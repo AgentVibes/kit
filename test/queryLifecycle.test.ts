@@ -57,6 +57,10 @@ describe("Query window focus refetch", () => {
     await query.fetch();
     expect(fetcher).toHaveBeenCalledTimes(1);
 
+    // isStale is `elapsed > staleTimeMs`; with staleTimeMs 0 a refetch in the
+    // same millisecond as the first fetch is still fresh, so let one pass.
+    await new Promise((resolve) => setTimeout(resolve, 5));
+
     query.enableWindowFocusRefetch();
     document.dispatchEvent(new Event("visibilitychange"));
     await Promise.resolve();
